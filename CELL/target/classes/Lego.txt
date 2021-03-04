@@ -1,0 +1,4 @@
+
+create SquareLego Square1 yellow
+create RectangleLego rect1 green east
+connect Square1 bottom rect1 topB
