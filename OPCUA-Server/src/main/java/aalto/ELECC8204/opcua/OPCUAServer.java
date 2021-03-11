@@ -54,6 +54,22 @@ public class OPCUAServer {
 		 * Kaikki OPC UA Server tehtävässä kirjoitettava koodi
 		 * tulee tähän metodiin.
 		 */
+		NodeManagerUaNode nodeManager = new NodeManagerUaNode(server,"http://www.aalto.com/OPCUA/HelloAddressSpace");
+	
+		int index = nodeManager.getNamespaceIndex();
+		NodeId objectId = new NodeId(index, 1);
+		BaseObjectType object = nodeManager.createInstance(BaseObjectType.class, "Object", objectId);
+		UaObject objectsFolder = server.getNodeManagerRoot().getObjectsFolder();
+		nodeManager.addNodeAndReference(objectsFolder, object, Identifiers.Organizes);
+		
+	
+		NodeId MuuttujaId = new NodeId(index, 2);
+		
+		
+		BaseDataVariableType variable = nodeManager.createInstance(BaseDataVariableType.class, "Variable", MuuttujaId);
+		variable.setDataTypeId(Identifiers.String);
+		variable.setValue("Hello OPC UA");
+		nodeManager.addNodeAndReference(object, variable, Identifiers.HasComponent);
 	}
 	
 	private void initialize(int port, int httpsPort, String applicationName)
