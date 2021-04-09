@@ -22,11 +22,13 @@ import com.prosysopc.ua.ApplicationIdentity;
 import com.prosysopc.ua.SecureIdentityException;
 import com.prosysopc.ua.ServiceException;
 import com.prosysopc.ua.StatusException;
+import com.prosysopc.ua.client.AddressSpace;
 import com.prosysopc.ua.client.AddressSpaceException;
 import com.prosysopc.ua.client.UaClient;
 import com.prosysopc.ua.nodes.UaInstance;
 import com.prosysopc.ua.nodes.UaNode;
 import com.prosysopc.ua.nodes.UaReference;
+import com.prosysopc.ua.nodes.UaType;
 
 /**
  * A very minimal client application. Connects to the server and reads/writes one
@@ -171,18 +173,52 @@ public class OPCUAClient {
 		/**
 		 * TODO Write your code here
 		 */
+		
+		try {
+			DataValue value = client.readValue(nodeId);
+			System.out.println(value.getValue());
+		} catch (ServiceException | StatusException e) {
+			System.out.println(e);
+		} 
+
 	}
 
 	protected void write(NodeId nodeId, String value) {
 		/**
 		 * TODO Write your code here
 		 */
+		try {
+			client.writeValue(nodeId, value);
+		} catch (ServiceException | StatusException e) {
+			System.out.println(e);
+		} 
 	}
 
 	protected NodeId findNodeId() {
 		/**
 		 * TODO Write your code here
 		 */
+		try {
+			AddressSpace add = client.getAddressSpace();
+			UaNode objectsFolder = add.getNode(Identifiers.ObjectsFolder);
+			UaReference[] references = objectsFolder.getForwardReferences(Identifiers.Organizes);
+			for (int i = 0; i < references.length; i++) {
+				UaNode nykyne = references[i].getTargetNode();
+				UaInstance instanssi = (UaInstance) nykyne;
+				UaType tyyppi = instanssi.getTypeDefinition();
+				NodeId tyypinNodeId = tyyppi.getNodeId();
+				if(tyypinNodeId.equals(Identifiers.BaseObjectType)) {
+					UaReference[] viittaukset = nykyne.getForwardReferences(Identifiers.HasComponent);
+					UaNode alkio = viittaukset[0].getTargetNode();
+					return alkio.getNodeId();
+				}
+			}
+			return null;
+		} catch (ServiceException | AddressSpaceException e) {
+					// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			//UaNode objectsFolder = client.getAddressSpace()//.getNode(Identifiers.ObjectsFolder);//.getNode(Identifiers.ObjectsFolder);
 		return null;
 	}
 }

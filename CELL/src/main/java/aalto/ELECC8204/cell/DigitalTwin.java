@@ -716,6 +716,13 @@ public class DigitalTwin {
             // physical assembly
     	
 // GREEN CODE STARTS HERE
+    	if(waitingForLego) {
+            if(lego.state == LegoState.AtAssembly) {
+                waitingForLego = false;
+            } else {
+                return;
+            }
+        }
 
 // GREEN CODE ENDS HERE
             
@@ -738,7 +745,9 @@ public class DigitalTwin {
                 }
 
 // BLUE CODE STARTS HERE
-
+                if(gotoLego) { // moving to lego start position
+                	gotoLego=assemblyArm.move();
+                }
 // BLUE CODE ENDS HERE        
 
                 /*                if(!gotoLego &&  (lego.orientation.getZ() > 0.1f)) {
@@ -860,7 +869,7 @@ public class DigitalTwin {
            collisionDetection = false;
            if (bottomReady) {
 // RED CODE STARTS HERE
-
+  lego = nextUnassembledLego();
 // RED CODE ENDS HERE
                 if(lego == null) {
                     if (physicalAssembly) {
